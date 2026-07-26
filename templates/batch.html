@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+
+{% block title %}Batch Screening & Compliance Review{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <h1><i class="fa-solid fa-table-list"></i> Batch Screening & Compliance Review (Scenario 2)</h1>
+        <p>Screen multiple credit applicants simultaneously. Binary feature engineering converts multi-class past-due records into compliance flags.</p>
+    </div>
+</div>
+
+<div class="batch-summary-grid">
+    <div class="summary-card">
+        <div class="summary-val">{{ samples|length if samples else 0 }}</div>
+        <div class="summary-label"><i class="fa-solid fa-users"></i> Batch Applicants Processed</div>
+    </div>
+
+    <div class="summary-card text-emerald">
+        <div class="summary-val">
+            {% if samples %}
+                {{ samples | selectattr('Approval_Status', 'equalto', 1) | list | length }}
+            {% else %}
+                0
+            {% endif %}
+        </div>
+        <div class="summary-label"><i class="fa-solid fa-check-double"></i> Eligible / Approved</div>
+    </div>
+
+    <div class="summary-card text-rose">
+        <div class="summary-val">
+            {% if samples %}
+                {{ samples | selectattr('Approval_Status', 'equalto', 0) | list | length }}
+            {% else %}
+                0
+            {% endif %}
+        </div>
+        <div class="summary-label"><i class="fa-solid fa-ban"></i> Ineligible / Rejected</div>
+    </div>
+
+    <div class="summary-card text-amber">
+        <div class="summary-val">
+            {% if samples %}
+                {{ samples | selectattr('Past_Due_Records', 'greaterthan', 0) | list | length }}
+            {% else %}
+                0
+            {% endif %}
+        </div>
+        <div class="summary-label"><i class="fa-solid fa-triangle-exclamation"></i> Past-Due Risk Flagged</div>
+    </div>
+</div>
+
+<div class="glass-panel table-panel">
+    <div class="table-toolbar">
+        <div class="table-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="batchSearchInput" placeholder="Filter by ID, Risk, Income Type..." class="search-input">
+        </div>
+        <div class="toolbar-actions">
+            <span class="badge badge-info"><i class="fa-solid fa-filter"></i> Feature Engineering: Past_Due > 0 &rarr; Binary Label</span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="batch-table" id="batchTable">
+            <thead>
+                <tr>
+                    <th>Applicant ID</th>
+                    <th>Demographics</th>
+                    <th>Income Profile</th>
+                    <th>Annual Income</th>
+                    <th>Employment</th>
+                    <th>Past-Due Records</th>
+                    <th>Inquiries (6M)</th>
+                    <th>Compliance Risk Label</th>
+                    <th>ML Prediction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if samples %}
+                    {% for row in samples %}
+                    <tr>
+                        <td class="font-mono text-cyan"><strong>{{ row.Applicant_ID }}</strong></td>
+                        <td>{{ row.Gender }}, {{ row.Age }} yrs</td>
+                        <td>{{ row.Income_Type }}</td>
+                        <td class="font-mono">${{ "{:,.2f}".format(row.Annual_Income) }}</td>
+                        <td>{{ row.Employment_Duration }} yrs</td>
+                        <td>
+                            {% if row.Past_Due_Records > 0 %}
+                                <span class="badge badge-danger"><i class="fa-solid fa-clock"></i> {{ row.Past_Due_Records }} incident(s)</span>
+                            {% else %}
+                                <span class="badge badge-success">Clean (0)</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ row.Credit_Inquiries }}</td>
+                        <td>
+                            {% if row.Risk_Label == 'High Risk' %}
+                                <span class="risk-tag risk-high"><i class="fa-solid fa-triangle-exclamation"></i> High Risk Flag</span>
+                            {% else %}
+                                <span class="risk-tag risk-low"><i class="fa-solid fa-shield-check"></i> Standard Risk</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.Approval_Status == 1 %}
+                                <span class="status-pill status-approved"><i class="fa-solid fa-circle-check"></i> Approved</span>
+                            {% else %}
+                                <span class="status-pill status-rejected"><i class="fa-solid fa-circle-xmark"></i> Rejected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center py-4">No batch samples found in database. Run dataset training first.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

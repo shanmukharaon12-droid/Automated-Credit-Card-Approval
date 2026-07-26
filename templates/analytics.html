@@ -1,0 +1,134 @@
+{% extends "layout.html" %}
+
+{% block title %}Machine Learning Analytics & EDA{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <h1><i class="fa-solid fa-chart-pie"></i> ML Model Performance & EDA Dashboard</h1>
+        <p>Exploratory Data Analysis, Feature Importance, Confusion Matrices, and Classification Algorithms Comparison.</p>
+    </div>
+</div>
+
+<!-- Algorithm Metrics Comparison Table -->
+<div class="glass-panel table-panel mb-6">
+    <div class="panel-header">
+        <h3><i class="fa-solid fa-trophy"></i> Classification Algorithm Evaluation Metrics</h3>
+        <span class="badge badge-emerald"><i class="fa-solid fa-check"></i> Selected Model: {{ best_model_name }}</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="batch-table">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Accuracy</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1-Score</th>
+                    <th>ROC-AUC</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if metrics %}
+                    {% for alg_name, scores in metrics.items() %}
+                    <tr {% if alg_name == best_model_name %}class="highlight-row"{% endif %}>
+                        <td class="font-bold">
+                            {% if alg_name == best_model_name %}
+                                <i class="fa-solid fa-crown text-amber"></i>
+                            {% endif %}
+                            {{ alg_name }}
+                        </td>
+                        <td class="font-mono text-cyan">{{ (scores['Accuracy'] * 100) | round(2) }}%</td>
+                        <td class="font-mono">{{ (scores['Precision'] * 100) | round(2) }}%</td>
+                        <td class="font-mono">{{ (scores['Recall'] * 100) | round(2) }}%</td>
+                        <td class="font-mono text-emerald"><strong>{{ (scores['F1-Score'] * 100) | round(2) }}%</strong></td>
+                        <td class="font-mono text-purple">{{ (scores['ROC-AUC'] * 100) | round(2) }}%</td>
+                        <td>
+                            {% if alg_name == best_model_name %}
+                                <span class="badge badge-success">Selected for Production</span>
+                            {% else %}
+                                <span class="badge badge-secondary">Evaluated</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Run model training pipeline to display evaluation metrics.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Feature Importance & Performance Charts -->
+<div class="grid-2 mb-6">
+    <div class="glass-panel">
+        <h3><i class="fa-solid fa-sliders"></i> Key Feature Importance ({{ best_model_name }})</h3>
+        <p class="text-muted mb-4">Ranked influence of financial indicators on credit card approval decision:</p>
+        
+        <div class="feature-importance-list">
+            {% if feature_importances %}
+                {% for feat, imp in feature_importances.items() %}
+                <div class="fi-item">
+                    <div class="fi-label font-mono">{{ feat }}</div>
+                    <div class="fi-bar-track">
+                        <div class="fi-bar-fill" style="width: {{ (imp * 100 * 2.5) | min(100) }}%;"></div>
+                    </div>
+                    <div class="fi-val font-mono">{{ (imp * 100) | round(1) }}%</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">Feature importance weights saved in model artifact.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h3><i class="fa-solid fa-chart-bar"></i> Algorithm Comparison Chart</h3>
+        <div class="img-preview-box">
+            <img src="{{ url_for('static', filename='images/eda/model_comparison.png') }}" alt="Model Comparison Plot" class="eda-img">
+        </div>
+    </div>
+</div>
+
+<!-- EDA Plots Grid -->
+<div class="section-header">
+    <h2><i class="fa-solid fa-images"></i> Exploratory Data Analysis (EDA) Insights</h2>
+</div>
+
+<div class="grid-2 mb-6">
+    <div class="glass-panel">
+        <h3><i class="fa-solid fa-chart-column"></i> Demographics & Financial Count Plots</h3>
+        <div class="img-preview-box">
+            <img src="{{ url_for('static', filename='images/eda/count_plots.png') }}" alt="Count Plots" class="eda-img">
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h3><i class="fa-solid fa-wave-square"></i> Income, Age & Inquiries Distributions</h3>
+        <div class="img-preview-box">
+            <img src="{{ url_for('static', filename='images/eda/distribution_plots.png') }}" alt="Distribution Plots" class="eda-img">
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="glass-panel">
+        <h3><i class="fa-solid fa-fire-flame-curved"></i> Correlation Heatmap Matrix</h3>
+        <div class="img-preview-box">
+            <img src="{{ url_for('static', filename='images/eda/correlation_heatmap.png') }}" alt="Correlation Heatmap" class="eda-img">
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h3><i class="fa-solid fa-border-all"></i> Confusion Matrices (4 Classifiers)</h3>
+        <div class="img-preview-box">
+            <img src="{{ url_for('static', filename='images/eda/confusion_matrices.png') }}" alt="Confusion Matrices" class="eda-img">
+        </div>
+    </div>
+</div>
+{% endblock %}

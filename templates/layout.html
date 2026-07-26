@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Credit Card Approval Prediction{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-slate">
+    <!-- Header Navigation -->
+    <header class="navbar-header">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">CreditIntel<span class="brand-badge">AI</span></span>
+                    <span class="brand-sub">Credit Approval Engine</span>
+                </div>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i> Overview
+                </a>
+                <a href="/predict" class="nav-link {% if request.path == '/predict' %}active{% endif %}">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Approval
+                </a>
+                <a href="/batch" class="nav-link {% if request.path == '/batch' %}active{% endif %}">
+                    <i class="fa-solid fa-table-list"></i> Batch Screening
+                </a>
+                <a href="/analytics" class="nav-link {% if request.path == '/analytics' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i> ML Analytics
+                </a>
+            </nav>
+
+            <div class="nav-actions">
+                <span class="cloud-status"><i class="fa-solid fa-cloud"></i> Watson ML Pipeline Active</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <i class="fa-solid fa-shield-halved"></i> Credit Card Approval Prediction System &bull; Powered by Machine Learning & Flask
+            </div>
+            <div class="footer-models">
+                <span>Algorithms: Logistic Regression | Decision Tree | Random Forest | XGBoost</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

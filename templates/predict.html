@@ -1,0 +1,221 @@
+{% extends "layout.html" %}
+
+{% block title %}Credit Card Approval Predictor{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <h1><i class="fa-solid fa-calculator"></i> Credit Card Approval Prediction Interface</h1>
+        <p>Input applicant financial indicators and select classification algorithm to perform real-time credit scoring.</p>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">
+    <i class="fa-solid fa-triangle-exclamation"></i> <strong>Prediction Error:</strong> {{ error }}
+</div>
+{% endif %}
+
+<div class="prediction-container">
+    <!-- Form Side -->
+    <div class="form-card glass-panel">
+        <h3 class="form-title"><i class="fa-solid fa-user-gear"></i> Applicant Profile Data</h3>
+        
+        <form action="/predict" method="POST" id="predictionForm">
+            
+            <div class="form-group">
+                <label for="algorithm"><i class="fa-solid fa-microchip"></i> Machine Learning Classifier</label>
+                <select name="algorithm" id="algorithm" class="form-control highlight-select">
+                    <option value="best" {% if form_data and form_data.get('algorithm') == 'best' %}selected{% endif %}>★ Auto-Select Best Performing Model</option>
+                    <option value="Random Forest" {% if form_data and form_data.get('algorithm') == 'Random Forest' %}selected{% endif %}>Random Forest Classifier</option>
+                    <option value="XGBoost Classifier" {% if form_data and form_data.get('algorithm') in ['XGBoost Classifier', 'XGBoost (Gradient Boosting)'] %}selected{% endif %}>XGBoost / Gradient Boosting</option>
+                    <option value="Logistic Regression" {% if form_data and form_data.get('algorithm') == 'Logistic Regression' %}selected{% endif %}>Logistic Regression</option>
+                    <option value="Decision Tree" {% if form_data and form_data.get('algorithm') == 'Decision Tree' %}selected{% endif %}>Decision Tree Classifier</option>
+                </select>
+            </div>
+
+            <div class="form-section-title"><i class="fa-solid fa-id-card"></i> Demographic Information</div>
+            
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select name="gender" id="gender" class="form-control">
+                        <option value="Female" {% if form_data and form_data.get('gender') == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Male" {% if form_data and form_data.get('gender') == 'Male' %}selected{% endif %}>Male</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age (Years)</label>
+                    <input type="number" name="age" id="age" min="18" max="85" value="{{ form_data.get('age', '35') if form_data else '35' }}" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label for="marital_status">Marital Status</label>
+                    <select name="marital_status" id="marital_status" class="form-control">
+                        <option value="Married" {% if form_data and form_data.get('marital_status') == 'Married' %}selected{% endif %}>Married</option>
+                        <option value="Single" {% if form_data and form_data.get('marital_status') == 'Single' %}selected{% endif %}>Single</option>
+                        <option value="Civil Union" {% if form_data and form_data.get('marital_status') == 'Civil Union' %}selected{% endif %}>Civil Union</option>
+                        <option value="Separated" {% if form_data and form_data.get('marital_status') == 'Separated' %}selected{% endif %}>Separated</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="housing_type">Housing Type</label>
+                    <select name="housing_type" id="housing_type" class="form-control">
+                        <option value="Own House" {% if form_data and form_data.get('housing_type') == 'Own House' %}selected{% endif %}>Own House</option>
+                        <option value="Rented Apartment" {% if form_data and form_data.get('housing_type') == 'Rented Apartment' %}selected{% endif %}>Rented Apartment</option>
+                        <option value="With Parents" {% if form_data and form_data.get('housing_type') == 'With Parents' %}selected{% endif %}>With Parents</option>
+                        <option value="Municipal Housing" {% if form_data and form_data.get('housing_type') == 'Municipal Housing' %}selected{% endif %}>Municipal Housing</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section-title"><i class="fa-solid fa-coins"></i> Income & Employment Profile</div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label for="income_type">Income Category</label>
+                    <select name="income_type" id="income_type" class="form-control">
+                        <option value="Working" {% if form_data and form_data.get('income_type') == 'Working' %}selected{% endif %}>Working</option>
+                        <option value="Commercial Associate" {% if form_data and form_data.get('income_type') == 'Commercial Associate' %}selected{% endif %}>Commercial Associate</option>
+                        <option value="State Servant" {% if form_data and form_data.get('income_type') == 'State Servant' %}selected{% endif %}>State Servant</option>
+                        <option value="Pensioner" {% if form_data and form_data.get('income_type') == 'Pensioner' %}selected{% endif %}>Pensioner</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="education_level">Education Level</label>
+                    <select name="education_level" id="education_level" class="form-control">
+                        <option value="Higher Education" {% if form_data and form_data.get('education_level') == 'Higher Education' %}selected{% endif %}>Higher Education</option>
+                        <option value="Secondary / Secondary Special" {% if form_data and form_data.get('education_level') == 'Secondary / Secondary Special' %}selected{% endif %}>Secondary / Special</option>
+                        <option value="Incomplete Higher" {% if form_data and form_data.get('education_level') == 'Incomplete Higher' %}selected{% endif %}>Incomplete Higher</option>
+                        <option value="Academic Degree" {% if form_data and form_data.get('education_level') == 'Academic Degree' %}selected{% endif %}>Academic Degree</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label for="annual_income">Annual Income ($)</label>
+                    <input type="number" name="annual_income" id="annual_income" step="1000" min="10000" max="500000" value="{{ form_data.get('annual_income', '85000') if form_data else '85000' }}" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="employment_duration">Employment Duration (Years)</label>
+                    <input type="number" name="employment_duration" id="employment_duration" step="0.5" min="0" max="50" value="{{ form_data.get('employment_duration', '6.5') if form_data else '6.5' }}" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-section-title"><i class="fa-solid fa-clock-rotate-left"></i> Credit & Loan History</div>
+
+            <div class="form-grid-3">
+                <div class="form-group">
+                    <label for="existing_loans">Existing Loans</label>
+                    <input type="number" name="existing_loans" id="existing_loans" min="0" max="10" value="{{ form_data.get('existing_loans', '1') if form_data else '1' }}" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="credit_inquiries">Credit Inquiries (6M)</label>
+                    <input type="number" name="credit_inquiries" id="credit_inquiries" min="0" max="15" value="{{ form_data.get('credit_inquiries', '1') if form_data else '1' }}" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="past_due_records">Past-Due Loan Records</label>
+                    <input type="number" name="past_due_records" id="past_due_records" min="0" max="10" value="{{ form_data.get('past_due_records', '0') if form_data else '0' }}" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Approval Status
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Result Side -->
+    <div class="result-card glass-panel">
+        {% if result %}
+        <div class="result-header">
+            <h3><i class="fa-solid fa-chart-pie"></i> Prediction Outcome</h3>
+            <span class="model-tag"><i class="fa-solid fa-cpu"></i> {{ result.model_used }}</span>
+        </div>
+
+        <div class="outcome-box {% if result.prediction == 1 %}outcome-approved{% else %}outcome-rejected{% endif %}">
+            <div class="outcome-icon">
+                {% if result.prediction == 1 %}
+                    <i class="fa-solid fa-circle-check"></i>
+                {% else %}
+                    <i class="fa-solid fa-circle-xmark"></i>
+                {% endif %}
+            </div>
+            <div class="outcome-details">
+                <span class="outcome-status">{{ result.status_text }}</span>
+                <span class="outcome-risk">{{ result.risk_level }}</span>
+            </div>
+        </div>
+
+        <div class="probability-section">
+            <div class="prob-header">
+                <span>Approval Probability Score</span>
+                <span class="prob-val">{{ result.approval_prob }}%</span>
+            </div>
+            <div class="prob-bar-track">
+                <div class="prob-bar-fill {% if result.prediction == 1 %}fill-green{% else %}fill-red{% endif %}" style="width: {{ result.approval_prob }}%;"></div>
+            </div>
+        </div>
+
+        <div class="factors-grid">
+            <div class="factor-box factor-positive">
+                <h4><i class="fa-solid fa-thumbs-up"></i> Positive Indicators</h4>
+                {% if result.positive_factors %}
+                    <ul>
+                    {% for item in result.positive_factors %}
+                        <li><i class="fa-solid fa-check"></i> {{ item }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No key positive indicators flagged.</p>
+                {% endif %}
+            </div>
+
+            <div class="factor-box factor-negative">
+                <h4><i class="fa-solid fa-triangle-exclamation"></i> Risk Factors</h4>
+                {% if result.risk_factors %}
+                    <ul>
+                    {% for item in result.risk_factors %}
+                        <li><i class="fa-solid fa-xmark"></i> {{ item }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Clean profile! No major risk factors flagged.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="api-simulation-box">
+            <h4><i class="fa-solid fa-cloud"></i> Watson ML Deployment Payload</h4>
+            <pre class="json-code">
+{
+  "prediction": "{{ result.status_text }}",
+  "approval_code": {{ result.prediction }},
+  "confidence_score": {{ result.approval_prob }},
+  "risk_level": "{{ result.risk_level }}",
+  "algorithm": "{{ result.model_used }}"
+}</pre>
+        </div>
+
+        {% else %}
+        <!-- Default Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-credit-card"></i></div>
+            <h3>Ready for Credit Scoring</h3>
+            <p>Fill in the financial and credit history parameters on the left and click <strong>Predict Approval Status</strong> to run real-time machine learning inference.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

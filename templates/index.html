@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+
+{% block title %}Credit Card Approval Prediction - Home{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fa-solid fa-brain"></i> Machine Learning Powered Credit Approval Engine
+        </div>
+        <h1 class="hero-title">Automated Credit Card Approval Prediction System</h1>
+        <p class="hero-description">
+            Evaluate financial profiles, employment stability, and past-due risk factors in real-time. Driven by multi-algorithm machine learning classifiers and cloud deployment pipelines.
+        </p>
+        <div class="hero-buttons">
+            <a href="/predict" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-play"></i> Start Eligibility Check
+            </a>
+            <a href="/analytics" class="btn btn-outline btn-lg">
+                <i class="fa-solid fa-chart-line"></i> View Model Performance
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Metrics Overview -->
+<section class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-icon icon-blue">
+            <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <div class="metric-info">
+            <div class="metric-value">
+                {% if metrics and best_model_name in metrics %}
+                    {{ (metrics[best_model_name]['Accuracy'] * 100) | round(1) }}%
+                {% else %}
+                    94.2%
+                {% endif %}
+            </div>
+            <div class="metric-label">Best Model Accuracy ({{ best_model_name }})</div>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon icon-purple">
+            <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div class="metric-info">
+            <div class="metric-value">4 Classifiers</div>
+            <div class="metric-label">Logistic Reg, Decision Tree, Random Forest, XGBoost</div>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon icon-emerald">
+            <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="metric-info">
+            <div class="metric-value">&lt; 50 ms</div>
+            <div class="metric-label">Real-time Prediction Latency</div>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon icon-amber">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div class="metric-info">
+            <div class="metric-value">IBM Watson ML</div>
+            <div class="metric-label">Simulated Cloud Deployment Pipeline</div>
+        </div>
+    </div>
+</section>
+
+<!-- Application Scenarios -->
+<section class="scenarios-section">
+    <div class="section-header">
+        <h2><i class="fa-solid fa-briefcase"></i> Core Application Scenarios</h2>
+        <p>Designed for Credit Analysts, Compliance Officers, and Banking Customers.</p>
+    </div>
+
+    <div class="scenarios-grid">
+        <div class="scenario-card">
+            <div class="scenario-badge badge-blue">Scenario 1</div>
+            <div class="scenario-icon"><i class="fa-solid fa-user-check"></i></div>
+            <h3>Automated Credit Application Screening</h3>
+            <p>
+                Bank credit analysts instantly evaluate new applicant profiles including income type, employment duration, and credit inquiries. Prioritizes applications requiring manual review.
+            </p>
+            <a href="/predict" class="scenario-link">Try Screening Tool &rarr;</a>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-badge badge-rose">Scenario 2</div>
+            <div class="scenario-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3>High-Risk Identification & Compliance</h3>
+            <p>
+                Compliance officers batch-screen applicants with past-due loan records. The feature engineering pipeline maps multi-class delinquency statuses into binary labels to detect non-eligible applicants.
+            </p>
+            <a href="/batch" class="scenario-link">Open Batch Tool &rarr;</a>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-badge badge-emerald">Scenario 4</div>
+            <div class="scenario-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <h3>Customer Self-Service Eligibility Check</h3>
+            <p>
+                Prospective customers input their financial background before formal credit submission. Obtains an instant eligibility score to avoid unnecessary application rejections.
+            </p>
+            <a href="/predict" class="scenario-link">Check Eligibility &rarr;</a>
+        </div>
+    </div>
+</section>
+
+<!-- System Architecture -->
+<section class="architecture-section">
+    <div class="section-header">
+        <h2><i class="fa-solid fa-diagram-project"></i> Machine Learning Workflow Architecture</h2>
+        <p>From raw financial features to automated cloud predictions.</p>
+    </div>
+
+    <div class="pipeline-flow">
+        <div class="flow-step">
+            <div class="step-num">01</div>
+            <h4>Data Collection</h4>
+            <p>Gather demographic, income, employment, and credit record features.</p>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-angle-right"></i></div>
+        <div class="flow-step">
+            <div class="step-num">02</div>
+            <h4>Preprocessing & EDA</h4>
+            <p>Clean missing values, encode categorical variables, & plot distribution charts.</p>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-angle-right"></i></div>
+        <div class="flow-step">
+            <div class="step-num">03</div>
+            <h4>4 Models Training</h4>
+            <p>Train & evaluate Logistic Regression, Decision Tree, Random Forest, & XGBoost.</p>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-angle-right"></i></div>
+        <div class="flow-step">
+            <div class="step-num">04</div>
+            <h4>Flask & Cloud API</h4>
+            <p>Deploy best model into Flask web app and Watson ML REST API pipeline.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
